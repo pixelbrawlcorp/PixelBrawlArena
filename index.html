@@ -18,7 +18,7 @@ function T(s,x,y,c='#fff',al='left',sz=8){X.font='bold '+sz+'px monospace';X.tex
 function mk(ci,x,f,human){return{ci,x,y:G,vx:0,vy:0,f,hp:MAXHP,ult:0,stun:0,act:null,cd:[0,0,0],combo:0,ct:0,bl:false,bh:3,dash:0,dcd:0,slam:0,human,in:{},flash:0,t:0,noarm:0,hide:0,aim:0,dn:0,dd:1,dv:0,rec:0,inv:0,sp:[0,0,0,0]}}
 const inF=(f,o,r)=>{const d=(o.x-f.x)*f.f;return d>-4&&d<r&&Math.abs(o.y-f.y)<32};
 const spark=(x,y,c,n=6)=>{for(let i=0;i<n;i++)fx.push({x,y,vx:(Math.random()-.5)*3,vy:(Math.random()-.8)*3,l:14,c})};
-function hit(f,o,d){if(f.ci==5&&f.sk&&!d._s)d={...d,dmg:d.dmg*SUKS,_s:1};const dr=d.dir||f.f,fa=(f.x>o.x?1:-1)==o.f;
+function hit(f,o,d){if(f.ci==5&&f.sk&&!d._s)d={...d,dmg:d.dmg*SUKS,_s:1};if((f.ci==4||f.ci==5)&&!d._b){d={...d,dmg:d.dmg>=25?d.dmg*.8:d.dmg>=9?d.dmg*.7:d.dmg,_b:1}}/* Sanji/Yuji balance: heavy hits trimmed */const dr=d.dir||f.f,fa=(f.x>o.x?1:-1)==o.f;
  if(o.fz){o.def=Math.min(30,(o.def||0)+d.dmg);spark(o.x,o.y-12,'#fff',3);blood(o.x,o.y-14,3);sfx('h');return 1}
  if(o.ci==5&&!o.sk&&o.act&&o.act.id==3&&o.act.cw&&yjCounter(o,f,d))return 0;
  if(o.inv>0)return 0;
@@ -362,7 +362,7 @@ function ai(f,o){const i={},d=o.x-f.x,ad=Math.abs(d);i.ax=o.x;i.ay=o.y-12;f.ait=
   else if(f.ci>=2&&ad<120&&Math.random()<.5)i['s'+(Math.random()*(f.ci>=3?3:2)|0)]=1;
   else if(Math.random()<.2)i.jump=1}
  return i}
-function start(a=sel,b=(sel+1+(Math.random()*5|0))%6,me=0){P=mk(a,70,1,!me);O=mk(b,250,-1,false);ME=me?O:P;VR=[];TR=[];fl_=0;hs=0;sl=[];ev=[];fx=[];tx=[];PJ=[];PL=[];cut=null;BM=[];RG=[];CK=[];BS=[];GF=[];AF=[];gc=null;ts=null;rr=null;wk={l:0};DM=null;KM=null;YB=[];YC=[];YW=[];YF=[];ko=0;FIN=null;state='fight'}
+function start(a=sel,b=(sel+1+(Math.random()*5|0))%6,me=0){P=mk(a,70,1,me===0);O=mk(b,250,-1,me===1);ME=me?O:P;VR=[];TR=[];fl_=0;hs=0;sl=[];ev=[];fx=[];tx=[];PJ=[];PL=[];cut=null;BM=[];RG=[];CK=[];BS=[];GF=[];AF=[];gc=null;ts=null;rr=null;wk={l:0};DM=null;KM=null;YB=[];YC=[];YW=[];YF=[];ko=0;FIN=null;state='fight'}
 
 /* ===== VFX v4 : halkalar, kesik izleri, bolt/blade/beam çizimleri ===== */
 const VE=[];function ring(x,y,r,c,o={}){if(net=='host'&&!LOC)VE.push(['r',x,y,r,c,o]);VR.push({x,y,r,c,l:o.l||14,l0:o.l||14,dr:o.dr==null?2.4:o.dr,e:o.e||0})}
@@ -422,7 +422,7 @@ function wsJoin(name,role){return new Promise((res,rej)=>{const base=relayBase()
  try{ws=new WebSocket(base+'/ws?room='+encodeURIComponent(name)+'&role='+role)}catch(e){return rej(new Error('noserver'))}
  const h={};let ok=0,done=0,tm=0;const fail=m=>{if(done)return;done=1;clearTimeout(tm);try{ws.close()}catch(e){}rej(new Error(m))};
  const room={on(e,cb){(h[e]=h[e]||[]).push(cb)},emit(e,d){if(ws.readyState!=1||ws.bufferedAmount>131072)return Promise.resolve();ws.send(JSON.stringify({e,d}));return Promise.resolve()},leave(){room.onclose=null;try{ws.close()}catch(e){}},onclose:null,onleft:null};
- tm=setTimeout(()=>fail('timeout'),12000);
+ tm=setTimeout(()=>fail('timeout'),60000);
  ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data)}catch(e){return}
   if(m.e=='__ok'){if(!done){done=1;ok=1;clearTimeout(tm);res(room)}return}
   if(m.e=='__err'){fail(m.d);return}

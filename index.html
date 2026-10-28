@@ -448,7 +448,7 @@ function step(){frame++;shake*=.85;
  if(net=='guest'&&state=='fight'&&frame-lastSnap>600){err='CONNECTION LOST';back();return}
  if(state=='over'&&net=='host'&&frame%6==0)send();
  if(state!='fight')return;
- if(net=='guest'){if(frame%2==0)room.emit('inp',inp()).catch(()=>{});for(const k in E)if(E[k]>0)E[k]--;sjFx(P);sjFx(O);fxs();return}
+ if(net=='guest'){room.emit('inp',inp()).catch(()=>{});for(const k in E)if(E[k]>0)E[k]--;sjFx(P);sjFx(O);fxs();return}
  if(hs>0){hs--;if(net=='host'&&frame%2==0)send();return}
  if(gc){const f=gc.f;gc.t++;f.flash=0;if(gc.t<40){shake=Math.max(shake,gc.t/12);if(gc.t%8==0)sfx('m');if(gc.t%2==0)fx.push({x:f.x+(Math.random()-.5)*14,y:f.y,vx:0,vy:-1-Math.random()*2,l:20,c:'#fff'})}if(gc.t==40){f.g5=1;f.ult=100;shake=14;sfx('u');spark(f.x,f.y-14,'#fff',30);spark(f.x,f.y-14,'#4ef',20)}if(gc.t>=100)gc=null;fxs();return}
  if(rr){const r=rr,a=r.a,o=r.o;r.t++;a.vx=o.vx=o.vy=0;o.stun=999;o.y=G;
@@ -465,7 +465,7 @@ function step(){frame++;shake*=.85;
   if(c.pin&&c.t>=c.pin+55||c.t>=c.dur){o.stun=70;o.kd=1;o.vx=-a.f*1.2;o.vy=-1;cut=null}
   fxs();if(net=='host'&&frame%2==0)send();return}
  P.in=inp();for(const k in E)if(E[k]>0)E[k]--;
- O.in=net=='host'?(frame-lastIn<90||(peerIn&&['l','r','jump','block','w','s','m1','dash','s0','s1','s2','ult'].some(k=>peerIn[k]))?peerIn:{ax:O.x+O.f*50,ay:O.y-12}):(aiD?ai(O,P):{ax:P.x,ay:P.y-12});if(ts){ts.t++;const z=ts.own,v=ts.tg;upd(z,v);if(ts.t>=ts.dur){v.fz=0;const dm=v.def||0;v.def=0;ts=null;if(dm>0){v.hp=Math.max(0,v.hp-dm);v.flash=12;v.stun=70;v.kd=1;v.vx=z.f*3;v.vy=-2;blood(v.x,v.y-14,36);spark(v.x,v.y-14,'#ffd23f',18);shake=18;hs=9;sfx('H');tx.push({x:v.x,y:v.y-34,s:'TIME RESUMES -'+Math.round(dm),l:60})}}}else{upd(P,O);upd(O,P)}
+ O.in=net=='host'?(peerIn&&lastIn>-99?peerIn:{ax:O.x+O.f*50,ay:O.y-12}):(aiD?ai(O,P):{ax:P.x,ay:P.y-12});if(ts){ts.t++;const z=ts.own,v=ts.tg;upd(z,v);if(ts.t>=ts.dur){v.fz=0;const dm=v.def||0;v.def=0;ts=null;if(dm>0){v.hp=Math.max(0,v.hp-dm);v.flash=12;v.stun=70;v.kd=1;v.vx=z.f*3;v.vy=-2;blood(v.x,v.y-14,36);spark(v.x,v.y-14,'#ffd23f',18);shake=18;hs=9;sfx('H');tx.push({x:v.x,y:v.y-34,s:'TIME RESUMES -'+Math.round(dm),l:60})}}}else{upd(P,O);upd(O,P)}
  for(const p of PJ){if(ts&&p.own==ts.tg)continue;p.x+=p.vx;p.y+=p.vy;p.l--;const t=p.own==P?O:P;
   if(Math.abs(p.x-t.x)<p.d.r+5&&p.y>t.y-26&&p.y<t.y+2&&!(t.inv>0)){hit(p.own,t,{...p.d,dir:Math.sign(p.vx)||1});p.l=0}
   if(p.d.th&&p.y>G-4&&p.l>0){p.l=0;GF.push({k:'c',x:p.x,t:0,own:p.own,d:{dmg:4,heavy:1,st:110}})}if(p.x<-20||p.x>W+20||p.y>G+10||p.y<-30)p.l=0}
@@ -619,7 +619,7 @@ function hud(){[[P,8,1],[O,W-8,-1]].forEach(([f,x,d])=>{const w=118,hw=w*f.hp/MA
  X.fillStyle=f.hp>MAXHP*.3?'#4c4':'#e53';X.fillRect(d>0?x:x-hw,6,hw,7);
  X.fillStyle='#000';X.fillRect(d>0?x-1:x-w-1,15,w+2,5);{const uv=f.sk?(f.om||0):f.ult;X.fillStyle=uv>=100&&frame%20<10?'#fff':uv>=100?'#ffd23f':f.sk?'#c01830':'#b6f';const uw=w*uv/100;X.fillRect(d>0?x:x-uw,16,uw,3)}
  T(CH[f.ci].n+(f.sk?' [SUKUNA]':'')+(f.sd?' [STAND]':'')+(f.g5?' [G5]':'')+(f.pf?' [FLAME]':f.fm>0?' [BLUE FLAME]':'')+(f.brn?' [BURN]':''),x,28,'#fff',d>0?'left':'right',7)});
- for(let k=0;k<4;k++){const x=8+k*20,y=H-20,rd=k<3?1-ME.cd[k]/cdOf(ME,k):(ME.sk?(ME.om||0):ME.ult)/100;X.fillStyle='#000';X.fillRect(x,y,17,17);X.fillStyle=k<3?'#46a':(rd>=1?'#ffd23f':'#639');X.fillRect(x+1,y+16-15*rd,15,15*rd);T(kn(KB[['s0','s1','s2','ult'][k]],1),x+8,y+12,'#fff','center',kn(KB[['s0','s1','s2','ult'][k]],1).length>2?6:8)}
+ if(net=='host')T('IN '+(frame-lastIn)+' L:'+(peerIn.l?1:0)+' R:'+(peerIn.r?1:0),8,12,'#0f0','left',6);for(let k=0;k<4;k++){const x=8+k*20,y=H-20,rd=k<3?1-ME.cd[k]/cdOf(ME,k):(ME.sk?(ME.om||0):ME.ult)/100;X.fillStyle='#000';X.fillRect(x,y,17,17);X.fillStyle=k<3?'#46a':(rd>=1?'#ffd23f':'#639');X.fillRect(x+1,y+16-15*rd,15,15*rd);T(kn(KB[['s0','s1','s2','ult'][k]],1),x+8,y+12,'#fff','center',kn(KB[['s0','s1','s2','ult'][k]],1).length>2?6:8)}
  T(kn(KB.l,1)+'/'+kn(KB.r,1)+' move '+kn(KB.jump,1)+' jump '+kn(KB.block,1)+' block '+kn(KB.dash,1)+' dash | '+kn(KB.m1,1)+'(+'+kn(KB.up,1)+'/'+kn(KB.dn,1)+') | '+kn(KB.s0,1)+' '+kn(KB.s1,1)+' '+kn(KB.s2,1)+' skills | '+kn(KB.ult,1)+' ult',W-4,H-4,'#ccc','right',5);yjHud()}
 function selDraw0(){bg();T('PIXEL BRAWL ARENA',W/2,20,'#ffd23f','center',12);T('Choose your fighter  (A/D + Enter or click)',W/2,32,'#fff','center',7);
  const n=CH.length,cw=Math.floor(312/n)-1;

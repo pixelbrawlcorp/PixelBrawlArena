@@ -465,7 +465,7 @@ function step(){frame++;shake*=.85;
   if(c.pin&&c.t>=c.pin+55||c.t>=c.dur){o.stun=70;o.kd=1;o.vx=-a.f*1.2;o.vy=-1;cut=null}
   fxs();if(net=='host'&&frame%2==0)send();return}
  P.in=inp();for(const k in E)if(E[k]>0)E[k]--;
- O.in=net=='host'?(frame-lastIn<15?peerIn:{ax:O.x+O.f*50,ay:O.y-12}):(aiD?ai(O,P):{ax:P.x,ay:P.y-12});if(ts){ts.t++;const z=ts.own,v=ts.tg;upd(z,v);if(ts.t>=ts.dur){v.fz=0;const dm=v.def||0;v.def=0;ts=null;if(dm>0){v.hp=Math.max(0,v.hp-dm);v.flash=12;v.stun=70;v.kd=1;v.vx=z.f*3;v.vy=-2;blood(v.x,v.y-14,36);spark(v.x,v.y-14,'#ffd23f',18);shake=18;hs=9;sfx('H');tx.push({x:v.x,y:v.y-34,s:'TIME RESUMES -'+Math.round(dm),l:60})}}}else{upd(P,O);upd(O,P)}
+ O.in=net=='host'?(frame-lastIn<90||(peerIn&&['l','r','jump','block','w','s','m1','dash','s0','s1','s2','ult'].some(k=>peerIn[k]))?peerIn:{ax:O.x+O.f*50,ay:O.y-12}):(aiD?ai(O,P):{ax:P.x,ay:P.y-12});if(ts){ts.t++;const z=ts.own,v=ts.tg;upd(z,v);if(ts.t>=ts.dur){v.fz=0;const dm=v.def||0;v.def=0;ts=null;if(dm>0){v.hp=Math.max(0,v.hp-dm);v.flash=12;v.stun=70;v.kd=1;v.vx=z.f*3;v.vy=-2;blood(v.x,v.y-14,36);spark(v.x,v.y-14,'#ffd23f',18);shake=18;hs=9;sfx('H');tx.push({x:v.x,y:v.y-34,s:'TIME RESUMES -'+Math.round(dm),l:60})}}}else{upd(P,O);upd(O,P)}
  for(const p of PJ){if(ts&&p.own==ts.tg)continue;p.x+=p.vx;p.y+=p.vy;p.l--;const t=p.own==P?O:P;
   if(Math.abs(p.x-t.x)<p.d.r+5&&p.y>t.y-26&&p.y<t.y+2&&!(t.inv>0)){hit(p.own,t,{...p.d,dir:Math.sign(p.vx)||1});p.l=0}
   if(p.d.th&&p.y>G-4&&p.l>0){p.l=0;GF.push({k:'c',x:p.x,t:0,own:p.own,d:{dmg:4,heavy:1,st:110}})}if(p.x<-20||p.x>W+20||p.y>G+10||p.y<-30)p.l=0}

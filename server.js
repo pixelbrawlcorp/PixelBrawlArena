@@ -1,7 +1,7 @@
 /* Pixel Brawl Arena - online relay server
  *
  * What it does
- *   - Serves the game file (index.html) at "/"      -> one deployment = game + online
+ *   - Serves the game file (index.html) at "/" and its scripts (js/*.js)  -> one deployment = game + online
  *   - Relays messages between the 2 players of a room over WebSocket ("/ws")
  *   - The game itself stays host-authoritative: the HOST simulates the fight and sends
  *     snapshots, the GUEST sends inputs. This server only forwards bytes, it knows
@@ -31,7 +31,18 @@ const ROOM_TTL_MS = 30 * 60 * 1000; // a room that never got a guest is removed 
 
 const rooms = new Map();            // code -> { host, guest, born }
 
+const JS_DIR = path.join(path.dirname(path.resolve(GAME_FILE)), 'js');   // game scripts: <game folder>/js/*.js
+
 const server = http.createServer((req, res) => {
+  const mjs = /^\/js\/([a-z0-9_-]+\.js)(\?.*)?$/i.exec(req.url);             // static: only js/<name>.js, no path tricks
+  if (mjs) {
+    fs.readFile(path.join(JS_DIR, mjs[1]), (err, buf) => {
+      if (err) { res.writeHead(404, { 'content-type': 'text/plain' }); return res.end('not found'); }
+      res.writeHead(200, { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'no-cache' });
+      res.end(buf);
+    });
+    return;
+  }
   if (req.url === '/health') { res.writeHead(200, { 'content-type': 'text/plain' }); return res.end('ok ' + rooms.size + ' rooms'); }
   if (req.url === '/' || req.url.startsWith('/?') || req.url === '/index.html') {
     fs.readFile(GAME_FILE, (err, buf) => {

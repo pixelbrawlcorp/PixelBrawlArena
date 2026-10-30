@@ -86,6 +86,8 @@ C.onmousemove=e=>{mpos(e);if(state=='set'){setMove();return}if(state=='select'){
 C.onmousedown=e=>{mpos(e);if(state=='set'){setMouse(e);return}if(state=='opts'){for(let i=0;i<3;i++)if(mx>60&&mx<260&&my>52+i*26&&my<72+i*26){orow=i;optCh(1);sfx('m')}if(my>138)beginMatch();return}if(state=='menu'){for(let i=0;i<4;i++)if(mx>90&&mx<230&&my>70+i*20&&my<86+i*20){menu=i;pick()}}
  else if(state=='select'){if(0){}else if(selAt(mx,my)>=0){sel=selAt(mx,my);go()}}else if(state=='fight'){const c='Mouse'+e.button;K[c]=1;press(c)}};
 C.oncontextmenu=e=>e.preventDefault();
+/* mobile long-press: block the native Save/Download/Copy menu and text/image selection (canvas + whole page) */
+for(const t of[C,document])for(const ev_ of['contextmenu','selectstart','dragstart'])t.addEventListener(ev_,e=>e.preventDefault(),{passive:false});
 {const d0=draw;draw=()=>{d0();X.fillStyle='rgba(0,0,0,.1)';for(let y=0;y<H;y+=2)X.fillRect(0,y,W,1);const g=X.createRadialGradient(W/2,H/2,60,W/2,H/2,200);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.45)');X.fillStyle=g;X.fillRect(0,0,W,H)}}
 loadSet();
 /* ===================== v13 : MUSIC ENGINE + FINISH ===================== */
